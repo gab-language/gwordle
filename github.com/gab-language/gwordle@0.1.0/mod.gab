@@ -7,9 +7,10 @@ UI
   .run(gui: ev app)
   .unwrap
 
-SIZE := 64
+SIZE := 48
 
 Colors := {
+  cl: 0x00000000
   bg: 0xff161821
   fg: 0xffcdd6f5
   bg\hl: 0xff272c42
@@ -26,6 +27,7 @@ Colors := {
 
 # TODO: Only has one hardcoded answer
 # TODO: Doesn't validate inputs from a list of valid 5-letter words.
+# TODO: Handle duplicate letters properly
 
 model := {
   guess: ""
@@ -35,7 +37,7 @@ model := {
 }
 
 dispatch\key: .defcase {
-  backspace: (model) :: model.put_by(guess: x :: x.pop.unwrap_or '')
+  backspace: (model down) :: down.and(model.put_by(guess: x :: x.pop.unwrap_or '')).or(model)
   space:     (model) :: model
   enter:     (model) :: do
     (model.guesses.len < 5)
@@ -91,16 +93,18 @@ bg_for_hint := (model i ok c) :: do
   
 end
 
-HintRow := (model str) :: do
+HintRow := (model str id) :: do
   Ranges.make(4).map i :: [
     box:
     {
+#id: '$#$'.sprintf(id i) .to\message
       w: 100
       h: 100
       align\x: center:
       align\y: center:
       bg: bg_for_hint.(model i str.at i)
       border: { fg: Colors.bg, w: 9 }
+      transition\duration: 5
     }
     [
       [
@@ -108,7 +112,7 @@ HintRow := (model str) :: do
         {
           size: SIZE
           content: str.at i .unwrap_or " "
-          bg: bg_for_hint.(model i str.at i)
+          bg: Colors.cl
           fg: Colors.bg
         }
       ]
@@ -116,16 +120,18 @@ HintRow := (model str) :: do
   ]
 end
 
-Row := (str) :: do
+Row := (str id) :: do
   Ranges.make(4).map i :: [
     box:
     {
+#id: '$#$'.sprintf(id i).to\message
       w: 100
       h: 100
       align\x: center:
       align\y: center:
       bg: Colors.fg
       border: { fg: Colors.bg, w: 9 }
+      transition\duration: 5
     }
     [
       [
@@ -134,7 +140,7 @@ Row := (str) :: do
           size: SIZE
           content: str.at i .unwrap_or " "
           fg: Colors.bg
-          bg: Colors.fg
+          bg: Colors.cl
         }
       ]
     ]
@@ -146,7 +152,7 @@ remaining := (model) :: do
  (chances > 0)
   .then(_ :: Ranges
     .make(chances - 1)
-    .map(_ :: [box: { layout: horizontal: } Row.("")]))
+    .map(i :: [box: { layout: horizontal: } Row.("" model.guesses.len + i + 1)]))
   .or []
 end
 
@@ -158,7 +164,7 @@ current_guess := (model) :: do
           bg: Colors.bg
           layout: horizontal:
         }
-        Row.(model.guess)
+        Row.(model.guess, model.guesses.len)
       ]])
     .or []
 end
@@ -185,7 +191,7 @@ view := (model) :: [
       bg: Colors.bg
     }
     [
-      model.guesses.map(g :: [box: { layout: horizontal: } HintRow.(model g)])*
+      model.guesses.map((g i) :: [box: { layout: horizontal: } HintRow.(model g i)])*
       current_guess.(model)*
       remaining.(model)*
     ]

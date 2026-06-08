@@ -1,0 +1,201 @@
+UI := 'github.com/gab-language/cgab@0.1.1' .use 'cui'
+Streams := 'github.com/gab-language/cgab@0.1.1' .use 'Transducers'
+
+(app ev) := (Channels.make, Channels.make)
+
+UI
+  .run(tui: ev app)
+  .unwrap
+
+SIZE := 64
+
+Colors := {
+  bg: 0xff161821
+  fg: 0xffcdd6f5
+  bg\hl: 0xff272c42
+  fg\hl: 0xffc6c8d1
+  w: 0xffffffff
+  r: 0xfff38ba9
+  o: 0xfffab388
+  y: 0xfff9e2b0
+  g: 0xffa6e3a2
+  b: 0xff89b4fb
+  i: 0xff94e2d6
+  v: 0xffcba6f8
+}
+
+# TODO: Only has one hardcoded answer
+# TODO: Doesn't validate inputs from a list of valid 5-letter words.
+
+model := {
+  guess: ""
+  answer: "clamp"
+  guesses: []
+  done: false:
+}
+
+dispatch\key: .defcase {
+  backspace: (model) :: model.put_by(guess: x :: x.pop.unwrap_or '')
+  space:     (model) :: model
+  enter:     (model) :: do
+    (model.guesses.len < 5)
+      .then (_ :: do
+        (model.guess.len == 5)
+          .then(_ :: do
+            model
+              .put_by(guesses: x :: x.push(model.guess))
+              .put(done: model.guess == model.answer)
+              .put(guess: '')
+            end)
+          .or model
+      end)
+      .or model
+  end
+}
+
+dispatch\key: .def (model down) :: do
+  key := self.to\string
+  new := model.put(guess: model.guess .+ key .slice 5)
+  (down | model.done).and model .or new
+end
+
+dispatch: .defcase {
+  tick: (model args) :: model
+  mouse: (model args) :: model
+  key:  (model args) :: do
+    (key, _, down) := args.*
+    key.dispatch\key(model down)
+  end
+}
+
+controller := (model event args*) :: do 
+  model := event.dispatch(model args)
+  model
+end
+
+bg_for_hint := (model i ok c) :: do
+  ok
+    .then(_ :: do
+      c.cond {
+        c :: model.answer.at i .unwrap_or nil: == c 
+        Colors.g
+
+        c :: model.answer.has\sub c
+        Colors.y
+
+        else:
+        Colors.bg
+      }
+    end)
+    .or(Colors.bg)
+  
+end
+
+HintRow := (model str) :: do
+  Ranges.make(4).map i :: [
+    box:
+    {
+      bg: Colors.bg
+      p\x: 9
+      p\y: 21
+    }
+    [
+      [
+        text:
+        {
+          size: SIZE
+          content: str.at i .unwrap_or " "
+          fg: bg_for_hint.(model i str.at i)
+          bg: Colors.bg
+        }
+      ]
+    ]
+  ]
+end
+
+Row := (str) :: do
+  Ranges.make(4).map i :: [
+    box:
+    {
+      p\x: 9
+      p\y: 21
+      bg: Colors.bg
+    }
+    [
+      [
+        text:
+        {
+          size: SIZE
+          content: str.at i .unwrap_or " "
+          fg: Colors.fg
+          bg: Colors.bg
+        }
+      ]
+    ]
+  ]
+end
+
+remaining := (model) :: do
+ chances := 4 - model.guesses.len
+ (chances > 0)
+  .then(_ :: Ranges
+    .make(chances - 1)
+    .map(_ :: [box: { layout: horizontal: } Row.("")]))
+  .or []
+end
+
+current_guess := (model) :: do
+  (model.guesses.len < 5)
+    .then(_ :: [[
+        box:
+        {
+          bg: Colors.bg
+          layout: horizontal:
+        }
+        Row.(model.guess)
+      ]])
+    .or []
+end
+
+view := (model) :: [
+  [
+    box:
+    {
+      w\g: 1
+      bg: Colors.bg
+      align\x: center:
+    }
+    [
+      [text: { size: SIZE * 2 bg: Colors.bg, fg: Colors.b, content: "gwordle" }]
+    ]
+  ]
+  [
+    box: 
+    {
+      align\x: center:
+      align\y: center:
+      h\g: 1
+      w\g: 1
+      bg: Colors.bg
+    }
+    [
+      model.guesses.map(g :: [box: { layout: horizontal: } HintRow.(model g)])*
+      current_guess.(model)*
+      remaining.(model)*
+    ]
+  ]
+]
+
+ev
+  .pipe(
+    app
+    Streams.take_until((e, key) :: do
+      (e == key:) & (key == escape:)
+    end)
+#|> Streams.tap((args*) :: args.eprintln)
+    |> Streams.reduce(model controller)
+#|> Streams.tap((model) :: model.eprintln)
+    |> Streams.map(view))
+
+app.close
+ev.close

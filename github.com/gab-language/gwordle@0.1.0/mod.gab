@@ -93,6 +93,13 @@ bg_for_hint := (model i ok c) :: do
   
 end
 
+#
+# NOTE
+#
+# You don't *need* ids here because our elements are always drawn in this order.
+# However, this is more of coincidence here - and if we want
+# the id to be really stable, we should do it ourselves.
+
 HintRow := (model str id) :: do
   Ranges.make(4).map i :: [
     box:

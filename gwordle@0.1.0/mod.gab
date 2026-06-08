@@ -1,5 +1,5 @@
-UI := 'github.com/gab-language/cgab@0.1.1' .use 'cui'
-Transducers := 'github.com/gab-language/cgab@0.1.1' .use 'Transducers'
+UI := 'github.com/gab-language/cgab@0.1.2' .use 'cui'
+Transducers := 'github.com/gab-language/cgab@0.1.2' .use 'Transducers'
 
 (app ev) := (Channels.make, Channels.make)
 

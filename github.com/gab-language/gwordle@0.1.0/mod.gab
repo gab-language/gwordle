@@ -1,10 +1,10 @@
 UI := 'github.com/gab-language/cgab@0.1.1' .use 'cui'
-Streams := 'github.com/gab-language/cgab@0.1.1' .use 'Transducers'
+Transducers := 'github.com/gab-language/cgab@0.1.1' .use 'Transducers'
 
 (app ev) := (Channels.make, Channels.make)
 
 UI
-  .run(tui: ev app)
+  .run(gui: ev app)
   .unwrap
 
 SIZE := 64
@@ -189,13 +189,13 @@ view := (model) :: [
 ev
   .pipe(
     app
-    Streams.take_until((e, key) :: do
+    Transducers.take_until((e, key) :: do
       (e == key:) & (key == escape:)
     end)
-#|> Streams.tap((args*) :: args.eprintln)
-    |> Streams.reduce(model controller)
-#|> Streams.tap((model) :: model.eprintln)
-    |> Streams.map(view))
+#|> Transducers.tap((args*) :: args.eprintln)
+    |> Transducers.reduce(model controller)
+#|> Transducers.tap((model) :: model.eprintln)
+    |> Transducers.map(view))
 
 app.close
 ev.close

@@ -37,7 +37,7 @@ model := {
 }
 
 dispatch\key: .defcase {
-  backspace: (model down) :: down.and(model.put_by(guess: x :: x.pop.unwrap_or '')).or(model)
+  backspace: (model) :: model.put_by(guess: x :: x.pop.unwrap_or '')
   space:     (model) :: model
   enter:     (model) :: do
     (model.guesses.len < 5)
@@ -55,18 +55,20 @@ dispatch\key: .defcase {
   end
 }
 
-dispatch\key: .def (model down) :: do
+dispatch\key: .def (model) :: do
   key := self.to\string
-  new := model.put(guess: model.guess .+ key .slice 5)
-  (down | model.done).and model .or new
+  model.put(guess: model.guess .+ key .slice 5)
 end
 
 dispatch: .defcase {
   tick: (model args) :: model
   mouse: (model args) :: model
   key:  (model args) :: do
-    (key, _, down) := args.*
-    key.dispatch\key(model down)
+    (type, key) := args.*
+    key := key.to\message
+    (type == up:)
+      .then(() ::  key.dispatch\key(model))
+      .or model
   end
 }
 
@@ -111,7 +113,7 @@ HintRow := (model str id) :: do
       align\y: center:
       bg: bg_for_hint.(model i str.at i)
       border: { fg: Colors.bg, w: 9 }
-      transition\duration: 5
+      transition\duration: 2
     }
     [
       [
@@ -138,7 +140,7 @@ Row := (str id) :: do
       align\y: center:
       bg: Colors.fg
       border: { fg: Colors.bg, w: 9 }
-      transition\duration: 5
+      transition\duration: 2
     }
     [
       [
@@ -208,8 +210,8 @@ view := (model) :: [
 ev
   .pipe(
     app
-    Transducers.take_until((e, key) :: do
-      (e == key:) & (key == escape:)
+    Transducers.take_until((e t key) :: do
+      (e == key:) & (key == "escape")
     end)
 #|> Transducers.tap((args*) :: args.eprintln)
     |> Transducers.reduce(model controller)

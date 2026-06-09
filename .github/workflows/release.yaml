@@ -63,6 +63,6 @@ jobs:
       run: |
         ./gab build -t '${{ matrix.arch }}-${{ matrix.os }}' -m github.com/gab-language/cgab@0.1.2 gwordle@${{ env.version }}
 
-    - name: Build release
+    - name: Upload release artifact
       run: |
         gh release upload -R '${{ github.repository }}' '${{ env.version }}' 'gwordle@${{env.version}}-cgab-0.1.2-${{ matrix.arch }}-${{ matrix.os }}.exe' || exit 0

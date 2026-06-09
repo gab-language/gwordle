@@ -1,5 +1,5 @@
 # GWORDLE
-This repository is mean to serve as an example of how to build and publish a Gab application.
+This repository is meant to serve as an example of how to build and publish a Gab application.
 
 ## Repository Structure
 The module containing our project is `gwordle@<version>`. There is only the one source file.

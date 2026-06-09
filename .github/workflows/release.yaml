@@ -54,7 +54,8 @@ jobs:
       run: |
         curl -L -f https://github.com/gab-language/cgab/releases/latest/download/gab-release-x86_64-linux-gnu -o gab
         chmod +x gab
-        ./gab get -y -t '${{ matrix.arch }}-${{ matrix.os }}'
+        ./gab info
+        ./gab get -n -y -t '${{ matrix.arch }}-${{ matrix.os }}'
         ./gab info
 
     - name: Build release

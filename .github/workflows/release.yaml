@@ -15,7 +15,6 @@ env:
 jobs:
   create_release:
     runs-on: ubuntu-latest
-    needs: run_tests
 
     permissions: write-all
 

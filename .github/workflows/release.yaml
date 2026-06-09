@@ -63,4 +63,4 @@ jobs:
 
     - name: Build release
       run: |
-        gh release upload -R '${{ github.repository }}' '${{ env.version }}' 'gwordle@${{env.version}}-${{ matrix.build_type }}-${{ matrix.target }}.exe' || exit 0
+        gh release upload -R '${{ github.repository }}' '${{ env.version }}' 'gwordle@${{env.version}}-${{ matrix.arch }}-${{ matrix.os }}.exe' || exit 0

@@ -6,6 +6,13 @@ The module containing our project is `gwordle@<version>`. There is only the one 
 
 By changing the message `gui:` to `tui:` on line 7, you can play wordle in the terminal without launching a new os window.
 
+## Running
+To run gwordle from the command line:
+```bash
+gab run gwordle@version
+```
+This will run the default `/mod.gab` module of the package.
+
 ## Building
 To build the standalone executable, use the gab cli:
 ```bash

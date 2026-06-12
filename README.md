@@ -2,21 +2,27 @@
 This repository is meant to serve as an example of how to build and publish a Gab application.
 
 ## Repository Structure
-The module containing our project is `gwordle@<version>`. There is only the one source file.
+The module containing our project is `gwordle`. There is only the one source file.
 
 By changing the message `gui:` to `tui:` on line 7, you can play wordle in the terminal without launching a new os window.
+
+## Installing
+```bash
+gab get github.com/gab-language/gwordle@0.1.0 gwordle
+```
+
 
 ## Running
 To run gwordle from the command line:
 ```bash
-gab run gwordle@version
+gab run gwordle
 ```
 This will run the default `/mod.gab` module of the package.
 
 ## Building
 To build the standalone executable, use the gab cli:
 ```bash
-gab build -m github.com/gab-language/cgab@gab_version gwordle@version
+gab build -m github.com/gab-language/cgab@gab_version gwordle
 ```
 This produces an executable for your platform. You may build cross-platform using the `-t` flag.
 

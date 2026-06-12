@@ -3,9 +3,44 @@ Transducers := 'github.com/gab-language/cgab@0.1.2' .use 'Transducers'
 
 (app ev) := (Channels.make, Channels.make)
 
-UI
-  .run(gui: ev app)
-  .unwrap
+Fibers.make () :: do
+  UI
+    .run(gui: ev app)
+    .unwrap
+end
+
+word_bank := 'gwordle' .use 'word_bank.csv'
+valid_words := 'gwordle' .use 'valid_words.csv'
+
+listify := (binary) :: do
+  str := binary.as\string.unwrap
+
+  str.to\stream\split('\n').collect []
+end
+
+dictify := (binary) :: do
+  str := binary.as\string.unwrap
+
+  words := str.to\stream\split('\n').collect []
+
+  shp := Shapes.from(words)
+
+  rec := shp.make()
+
+  rec
+end
+
+word_bank := listify.(word_bank)
+
+valid_words := dictify.(valid_words)
+
+random_answer := () :: do
+  word_bank.at(Numbers.int\between(0, word_bank.len)).unwrap
+end
+
+validate_word := (word) :: do
+  valid_words.at(word).ok
+end
 
 SIZE := 48
 
@@ -31,7 +66,7 @@ Colors := {
 
 model := {
   guess: ""
-  answer: "clamp"
+  answer: random_answer.()
   guesses: []
   done: false:
 }
@@ -42,7 +77,7 @@ dispatch\key: .defcase {
   enter:     (model) :: do
     (model.guesses.len < 5)
       .then (_ :: do
-        (model.guess.len == 5)
+        ((model.guess.len == 5) & validate_word.(model.guess))
           .then(_ :: do
             model
               .put_by(guesses: x :: x.push(model.guess))

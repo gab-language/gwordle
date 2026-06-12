@@ -61,8 +61,8 @@ jobs:
 
     - name: Build release
       run: |
-        ./gab build -t '${{ matrix.arch }}-${{ matrix.os }}' -m github.com/gab-language/cgab@0.1.2 gwordle@${{ env.version }}
+        ./gab build -t '${{ matrix.arch }}-${{ matrix.os }}' -m github.com/gab-language/cgab@0.1.2 gwordle
 
     - name: Upload release artifact
       run: |
-        gh release upload -R '${{ github.repository }}' '${{ env.version }}' 'gwordle@${{env.version}}-cgab-0.1.2-${{ matrix.arch }}-${{ matrix.os }}.exe' || exit 0
+        gh release upload -R '${{ github.repository }}' '${{ env.version }}' 'gwordle-cgab-0.1.2-${{ matrix.arch }}-${{ matrix.os }}.exe' || exit 0

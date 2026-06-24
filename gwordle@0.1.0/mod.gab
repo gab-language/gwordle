@@ -9,8 +9,8 @@ Fibers.make () :: do
     .unwrap
 end
 
-word_bank := 'gwordle' .use 'word_bank.csv'
-valid_words := 'gwordle' .use 'valid_words.csv'
+word_bank := 'gwordle@0.1.0' .use 'word_bank.csv'
+valid_words := 'gwordle@0.1.0' .use 'valid_words.csv'
 
 listify := (binary) :: do
   str := binary.as\string.unwrap

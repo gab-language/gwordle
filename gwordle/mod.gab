@@ -1,5 +1,5 @@
-UI := 'github.com/gab-language/cgab@0.1.2' .use 'cui'
-Transducers := 'github.com/gab-language/cgab@0.1.2' .use 'Transducers'
+UI := 'github.com/gab-language/cgab@0.1.3' .use 'cui'
+Transducers := 'github.com/gab-language/cgab@0.1.3' .use 'Transducers'
 
 (app ev) := (Channels.make, Channels.make)
 
@@ -155,10 +155,10 @@ HintRow := (model str id) :: do
         text:
         {
           size: SIZE
-          content: str.at i .unwrap_or " "
           bg: Colors.cl
           fg: Colors.bg
         }
+        str.at i .unwrap_or " "
       ]
     ]
   ]
@@ -182,10 +182,10 @@ Row := (str id) :: do
         text:
         {
           size: SIZE
-          content: str.at i .unwrap_or " "
           fg: Colors.bg
           bg: Colors.cl
         }
+        str.at i .unwrap_or " "
       ]
     ]
   ]
@@ -222,7 +222,7 @@ view := (model) :: [
       align\x: center:
     }
     [
-      [text: { size: SIZE * 2 bg: Colors.bg, fg: Colors.b, content: "gwordle" }]
+      [text: { size: SIZE * 2 bg: Colors.bg, fg: Colors.b } "gwordle"]
     ]
   ]
   [

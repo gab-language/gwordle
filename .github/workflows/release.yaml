@@ -61,8 +61,8 @@ jobs:
 
     - name: Build release
       run: |
-        ./gab build -t '${{ matrix.arch }}-${{ matrix.os }}' -m github.com/gab-language/cgab@0.1.3 gwordle
+          ./gab build -t '${{ matrix.arch }}-${{ matrix.os }}' -m github.com/gab-language/cgab@0.1.3 -m gwordle:word_bank.csv -m gwordle:valid_words.csv gwordle
 
     - name: Upload release artifact
       run: |
-        gh release upload -R '${{ github.repository }}' '${{ env.version }}' 'gwordle-cgab-0.1.3-${{ matrix.arch }}-${{ matrix.os }}.exe' || exit 0
+        gh release upload -R '${{ github.repository }}' '${{ env.version }}' 'gwordle-cgab-0.1.3-${{ matrix.arch }}-${{ matrix.os }}' || exit 0

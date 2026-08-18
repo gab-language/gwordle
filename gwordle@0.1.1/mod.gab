@@ -1,5 +1,5 @@
-UI := 'github.com/gab-language/cgab@0.1.3' .use 'cui'
-Transducers := 'github.com/gab-language/cgab@0.1.3' .use 'Transducers'
+UI := 'github.com/gab-language/cgab@0.1.5' .use 'cui'
+Transducers := 'github.com/gab-language/cgab@0.1.5' .use 'Transducers'
 
 (app ev) := (Channels.make, Channels.make)
 
@@ -23,9 +23,7 @@ dictify := (binary) :: do
 
   words := str.to\stream\split('\n').collect []
 
-  shp := Shapes.from(words)
-
-  rec := shp.make()
+  rec := words.reduce({} (a x) :: a.put x)
 
   rec
 end
@@ -80,7 +78,7 @@ dispatch\key: .defcase {
         ((model.guess.len == 5) & validate_word.(model.guess))
           .then(_ :: do
             model
-              .put_by(guesses: x :: x.push(model.guess))
+              .put_by(guesses: x :: x.cons(model.guess))
               .put(done: model.guess == model.answer)
               .put(guess: '')
             end)

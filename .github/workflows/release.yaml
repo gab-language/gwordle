@@ -51,10 +51,9 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    # TODO: Pin this Gab release
     - name: Setup Gab
       run: |
-        curl -L -f https://github.com/gab-language/cgab/releases/download/0.1.5/gab-cgab-0.1.5-x86_64-linux-gnu -o gab
+        curl -L -f https://github.com/gab-language/cgab/releases/download/0.1.5/gab-cgab-0.1.5-x86_64-linux-gnu.exe -o gab
         chmod +x gab
         ./gab get -n -y -t '${{ matrix.arch }}-${{ matrix.os }}'
         ./gab info

@@ -9,7 +9,7 @@ on:
     branches: [ "main" ]
 
 env:
-  version: 0.1.0
+  version: 0.1.1
   GH_TOKEN: ${{ github.token }}
 
 jobs:
@@ -54,15 +54,15 @@ jobs:
     # TODO: Pin this Gab release
     - name: Setup Gab
       run: |
-        curl -L -f https://github.com/gab-language/cgab/releases/download/0.1.3/gab-cgab-0.1.3-x86_64-linux-gnu -o gab
+        curl -L -f https://github.com/gab-language/cgab/releases/download/0.1.5/gab-cgab-0.1.5-x86_64-linux-gnu -o gab
         chmod +x gab
         ./gab get -n -y -t '${{ matrix.arch }}-${{ matrix.os }}'
         ./gab info
 
     - name: Build release
       run: |
-          ./gab build -t '${{ matrix.arch }}-${{ matrix.os }}' -m github.com/gab-language/cgab@0.1.3 -m gwordle@0.1.0:word_bank.csv -m gwordle@0.1.0:valid_words.csv gwordle@0.1.0
+          ./gab build -t '${{ matrix.arch }}-${{ matrix.os }}' -m github.com/gab-language/cgab@0.1.5 -m gwordle@{{ env.version }}:word_bank.csv -m gwordle@{{ env.version }}:valid_words.csv gwordle@{{ env.version }}
 
     - name: Upload release artifact
       run: |
-        gh release upload -R '${{ github.repository }}' '${{ env.version }}' 'gwordle@0.1.0-cgab-0.1.3-${{ matrix.arch }}-${{ matrix.os }}' || exit 0
+        gh release upload -R '${{ github.repository }}' '${{ env.version }}' 'gwordle@{{ env.version }}-cgab-0.1.5-${{ matrix.arch }}-${{ matrix.os }}' || exit 0

@@ -1,5 +1,5 @@
-UI := 'github.com/gab-language/cgab@0.1.5' .use 'cui'
-Transducers := 'github.com/gab-language/cgab@0.1.5' .use 'Transducers'
+UI := 'github.com/gab-language/cgab@0.1.6' .use 'cui'
+Transducers := 'github.com/gab-language/cgab@0.1.6' .use 'Transducers'
 
 (app ev) := (Channels.make, Channels.make)
 
@@ -69,21 +69,28 @@ model := {
   done: false:
 }
 
+[model?] .defmodule {
+  is\guessable: () :: do
+    (self.guesses.len < 5)
+      & (self.guess.len == 5)
+      & (validate_word.(self.guess))
+  end
+  make_guess: () :: do
+    m := self
+
+    m
+      .put_by(guesses: x :: x.cons(m.guess))
+      .put(done: m.guess == m.answer)
+      .put(guess: '')
+  end
+}
+
 dispatch\key: .defcase {
   backspace: (model) :: model.put_by(guess: x :: x.pop.unwrap_or '')
   space:     (model) :: model
   enter:     (model) :: do
-    (model.guesses.len < 5)
-      .then (_ :: do
-        ((model.guess.len == 5) & validate_word.(model.guess))
-          .then(_ :: do
-            model
-              .put_by(guesses: x :: x.cons(model.guess))
-              .put(done: model.guess == model.answer)
-              .put(guess: '')
-            end)
-          .or model
-      end)
+    model.is\guessable
+      .then(() :: model.make_guess)
       .or model
   end
 }
